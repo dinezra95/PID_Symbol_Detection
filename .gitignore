@@ -1,10 +1,16 @@
 venv
 requirements-mac.txt
 
-# Heavy data / models / results
+# Heavy data / models
 data/
 models/
-results/
+
+# Results — only keep stage 3 labeled_v2 outputs
+results/stage_1/
+results/stage_2/
+results/stage_3/pipe_detection/
+results/stage_3/pipe_detection_fullres/
+results/stage_3/pipe_detection_labeled/
 
 # OS / IDE
 .DS_Store

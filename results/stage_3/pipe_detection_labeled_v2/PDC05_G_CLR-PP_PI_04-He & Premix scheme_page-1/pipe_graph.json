@@ -1,0 +1,712 @@
+{
+  "nodes": [
+    {
+      "id": 259,
+      "x": 8002.0,
+      "y": 3684.8333333333335,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        133
+      ]
+    },
+    {
+      "id": 4,
+      "x": 2537.0,
+      "y": 3477.953125,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        2
+      ]
+    },
+    {
+      "id": 5,
+      "x": 7334.75,
+      "y": 3477.9765625,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        2,
+        342
+      ]
+    },
+    {
+      "id": 710,
+      "x": 8532.0,
+      "y": 3103.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        480
+      ]
+    },
+    {
+      "id": 261,
+      "x": 3681.0,
+      "y": 4715.5,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        134,
+        235
+      ]
+    },
+    {
+      "id": 262,
+      "x": 4330.0,
+      "y": 4715.5,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        134,
+        293
+      ]
+    },
+    {
+      "id": 260,
+      "x": 9392.333333333334,
+      "y": 3684.325396825397,
+      "type": "T",
+      "degree": 3,
+      "connected_pipes": [
+        133,
+        148,
+        179
+      ]
+    },
+    {
+      "id": 74,
+      "x": 5962.0,
+      "y": 4715.5,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        38
+      ]
+    },
+    {
+      "id": 75,
+      "x": 6612.75,
+      "y": 4716.25,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        38,
+        291
+      ]
+    },
+    {
+      "id": 520,
+      "x": 7918.125,
+      "y": 3225.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        355
+      ]
+    },
+    {
+      "id": 521,
+      "x": 7918.125,
+      "y": 3478.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        355
+      ]
+    },
+    {
+      "id": 339,
+      "x": 6546.0,
+      "y": 5058.0,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        174,
+        500
+      ]
+    },
+    {
+      "id": 340,
+      "x": 6611.0,
+      "y": 5052.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        174
+      ]
+    },
+    {
+      "id": 21,
+      "x": 6095.5,
+      "y": 4790.0,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        11,
+        317
+      ]
+    },
+    {
+      "id": 22,
+      "x": 11353.0,
+      "y": 4807.0,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        11,
+        248
+      ]
+    },
+    {
+      "id": 28,
+      "x": 8531.5,
+      "y": 2948.75,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        15,
+        480
+      ]
+    },
+    {
+      "id": 29,
+      "x": 8709.75,
+      "y": 2948.75,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        15,
+        278
+      ]
+    },
+    {
+      "id": 348,
+      "x": 8446.0,
+      "y": 3656.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        179
+      ]
+    },
+    {
+      "id": 287,
+      "x": 6097.0,
+      "y": 5187.0,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        147,
+        317
+      ]
+    },
+    {
+      "id": 288,
+      "x": 6171.0,
+      "y": 5186.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        147
+      ]
+    },
+    {
+      "id": 289,
+      "x": 7696.0,
+      "y": 3713.0714285714284,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        148,
+        341
+      ]
+    },
+    {
+      "id": 98,
+      "x": 7332.75,
+      "y": 3785.75,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        51,
+        342
+      ]
+    },
+    {
+      "id": 99,
+      "x": 8715.25,
+      "y": 3785.75,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        51,
+        278
+      ]
+    },
+    {
+      "id": 419,
+      "x": 3680.0,
+      "y": 4152.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        235
+      ]
+    },
+    {
+      "id": 101,
+      "x": 6617.75,
+      "y": 4250.0,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        53,
+        291
+      ]
+    },
+    {
+      "id": 102,
+      "x": 7172.0,
+      "y": 4244.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        53
+      ]
+    },
+    {
+      "id": 740,
+      "x": 6563.0,
+      "y": 4991.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        500
+      ]
+    },
+    {
+      "id": 425,
+      "x": 11352.0,
+      "y": 4232.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        248
+      ]
+    },
+    {
+      "id": 107,
+      "x": 4335.0,
+      "y": 4250.5,
+      "type": "L",
+      "degree": 2,
+      "connected_pipes": [
+        56,
+        293
+      ]
+    },
+    {
+      "id": 108,
+      "x": 4889.0,
+      "y": 4245.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        56
+      ]
+    },
+    {
+      "id": 499,
+      "x": 7695.0,
+      "y": 3386.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        341
+      ]
+    },
+    {
+      "id": 573,
+      "x": 5178.0,
+      "y": 3074.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        388
+      ]
+    },
+    {
+      "id": 574,
+      "x": 5178.0,
+      "y": 3273.0,
+      "type": "endpoint",
+      "degree": 1,
+      "connected_pipes": [
+        388
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": 259,
+      "to": 260,
+      "pipe_id": 133,
+      "length": 1395.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 4,
+      "to": 5,
+      "pipe_id": 2,
+      "length": 4799.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 5,
+      "to": 98,
+      "pipe_id": 342,
+      "length": 309.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 710,
+      "to": 28,
+      "pipe_id": 480,
+      "length": 155.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 261,
+      "to": 262,
+      "pipe_id": 134,
+      "length": 649.0,
+      "label": "O1/4\"",
+      "diameter": "O1/4\"",
+      "pipe_type": null
+    },
+    {
+      "from": 261,
+      "to": 419,
+      "pipe_id": 235,
+      "length": 565.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 262,
+      "to": 107,
+      "pipe_id": 293,
+      "length": 461.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 260,
+      "to": 289,
+      "pipe_id": 148,
+      "length": 1671.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 260,
+      "to": 348,
+      "pipe_id": 179,
+      "length": 966.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 74,
+      "to": 75,
+      "pipe_id": 38,
+      "length": 652.0,
+      "label": "1/4\"",
+      "diameter": "1/4\"",
+      "pipe_type": null
+    },
+    {
+      "from": 75,
+      "to": 101,
+      "pipe_id": 291,
+      "length": 461.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 520,
+      "to": 521,
+      "pipe_id": 355,
+      "length": 253.0,
+      "label": "@1/4",
+      "diameter": "1/4",
+      "pipe_type": null
+    },
+    {
+      "from": 339,
+      "to": 340,
+      "pipe_id": 174,
+      "length": 82.0,
+      "label": "14/12/23]",
+      "diameter": "14/12/23",
+      "pipe_type": null
+    },
+    {
+      "from": 339,
+      "to": 740,
+      "pipe_id": 500,
+      "length": 73.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 21,
+      "to": 22,
+      "pipe_id": 11,
+      "length": 5259.0,
+      "label": "[19/9/23; 25/10/23}",
+      "diameter": "25/10/23",
+      "pipe_type": null
+    },
+    {
+      "from": 21,
+      "to": 287,
+      "pipe_id": 317,
+      "length": 414.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 22,
+      "to": 425,
+      "pipe_id": 248,
+      "length": 576.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 28,
+      "to": 29,
+      "pipe_id": 15,
+      "length": 177.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 29,
+      "to": 99,
+      "pipe_id": 278,
+      "length": 839.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 287,
+      "to": 288,
+      "pipe_id": 147,
+      "length": 73.0,
+      "label": "14/1/25",
+      "diameter": "14/1/25",
+      "pipe_type": null
+    },
+    {
+      "from": 289,
+      "to": 499,
+      "pipe_id": 341,
+      "length": 328.0,
+      "label": "@1/4",
+      "diameter": "1/4",
+      "pipe_type": null
+    },
+    {
+      "from": 98,
+      "to": 99,
+      "pipe_id": 51,
+      "length": 1387.0,
+      "label": "1/4\"; 21/4\"; O1/4\"",
+      "diameter": "O1/4\"",
+      "pipe_type": null
+    },
+    {
+      "from": 101,
+      "to": 102,
+      "pipe_id": 53,
+      "length": 548.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 107,
+      "to": 108,
+      "pipe_id": 56,
+      "length": 548.0,
+      "label": null,
+      "diameter": null,
+      "pipe_type": null
+    },
+    {
+      "from": 573,
+      "to": 574,
+      "pipe_id": 388,
+      "length": 199.0,
+      "label": "O1/4\"",
+      "diameter": "O1/4\"",
+      "pipe_type": null
+    }
+  ],
+  "num_junctions": 33,
+  "num_pipes": 25,
+  "text_regions": [
+    {
+      "bbox": [
+        7854,
+        2548,
+        170,
+        61
+      ],
+      "text": "@1/4",
+      "confidence": 0.82
+    },
+    {
+      "bbox": [
+        7606,
+        2653,
+        170,
+        61
+      ],
+      "text": "@1/4",
+      "confidence": 0.8
+    },
+    {
+      "bbox": [
+        5646,
+        3739,
+        200,
+        61
+      ],
+      "text": "1/4\"",
+      "confidence": 0.51
+    },
+    {
+      "bbox": [
+        11749,
+        3745,
+        199,
+        61
+      ],
+      "text": "21/4\"",
+      "confidence": 0.33
+    },
+    {
+      "bbox": [
+        3220,
+        3767,
+        169,
+        60
+      ],
+      "text": "O1/4\"",
+      "confidence": 0.78
+    },
+    {
+      "bbox": [
+        5087,
+        4674,
+        200,
+        61
+      ],
+      "text": "O1/4\"",
+      "confidence": 0.7
+    },
+    {
+      "bbox": [
+        8037,
+        4682,
+        171,
+        61
+      ],
+      "text": "O1/4\"",
+      "confidence": 0.83
+    },
+    {
+      "bbox": [
+        9950,
+        4704,
+        199,
+        61
+      ],
+      "text": "1/4\"",
+      "confidence": 0.53
+    },
+    {
+      "bbox": [
+        340,
+        4827,
+        166,
+        39
+      ],
+      "text": "[19/9/23",
+      "confidence": 0.46
+    },
+    {
+      "bbox": [
+        336,
+        4898,
+        199,
+        39
+      ],
+      "text": "25/10/23}",
+      "confidence": 0.77
+    },
+    {
+      "bbox": [
+        340,
+        5042,
+        195,
+        39
+      ],
+      "text": "14/12/23]",
+      "confidence": 0.86
+    },
+    {
+      "bbox": [
+        340,
+        5114,
+        166,
+        39
+      ],
+      "text": "14/1/25",
+      "confidence": 0.95
+    },
+    {
+      "bbox": [
+        1405,
+        9697,
+        160,
+        38
+      ],
+      "text": "14/1/25",
+      "confidence": 0.67
+    }
+  ]
+}
