@@ -1,0 +1,23 @@
+venv
+requirements-mac.txt
+
+# Heavy data / models / results
+data/
+models/
+results/
+
+# OS / IDE
+.DS_Store
+.vscode/
+__pycache__/
+*.pyc
+
+# Temp scripts
+src/check_ocr*.py
+
+# Playground / notebooks
+playground/
+playgronund.ipynb
+
+# PDF docs in src
+src/*.pdf

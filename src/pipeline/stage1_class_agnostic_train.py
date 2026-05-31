@@ -92,6 +92,7 @@ class Stage1ClassAgnosticPipeline(BasePipeline):
             epochs=config['epochs'],
             batch_size=config['batch_size'],
             img_size=config['image_size'],
+            patience=config.get('patience', 100),
         )
 
 

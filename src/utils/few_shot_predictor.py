@@ -18,7 +18,7 @@ class FewShotClassPredictor:
             model_path: Path to the pre-trained model
             transform: Optional transform to be applied to the image
         """
-        self.fewshot_model = torch.load(model_path)
+        self.fewshot_model = torch.load(model_path, map_location="cpu")
         self.fewshot_model.eval()
         self.embedding_model = self.fewshot_model.embedding_net
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -122,6 +122,7 @@ class FewShotClassPredictor:
         if not image_paths:
             self.logger.error(f"No images found in {img_src}. Check the extensions and the directory.")
             return
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
         for image_path in image_paths:
             self.logger.info(f"Processing image: {image_path}")
             # Check if the image exists

@@ -32,6 +32,7 @@ class YOLOTrainer:
         try:
             device = "0" if torch.cuda.is_available() else "cpu"
             # Train the model
+            amp = device != "mps"
             results = self.model.train(
                 data=str(self.data_yaml),
                 epochs=epochs,
@@ -39,6 +40,7 @@ class YOLOTrainer:
                 imgsz=(img_size[0], img_size[1]),
                 device=device,
                 multi_scale=False,
+                amp=amp,
                 project=str(self.output_dir),
                 **kwargs
             )

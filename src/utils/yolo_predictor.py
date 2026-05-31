@@ -47,7 +47,7 @@ class YOLOPredictor:
         
         for image_path in image_paths:
             result = get_sliced_prediction(str(image_path), detection_model, slice_height, slice_width, overlap_height_ratio, overlap_width_ratio)
-            result.export_visuals(export_dir=f"{str(output_dir)}/{str(Path(image_path).stem)}", hide_conf=save_conf)
+            result.export_visuals(export_dir=f"{str(output_dir)}/{str(Path(image_path).stem)}", hide_labels=True, hide_conf=True)
             if save_txt:
                 coco_array_to_yolo_file(result.to_coco_predictions(), result, output_dir, Path(image_path), save_conf)
 

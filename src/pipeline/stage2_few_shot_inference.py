@@ -40,12 +40,16 @@ class Stage2FewShotInferencePipeline(BasePipeline):
             raise FileNotFoundError("Few-shot model directory not found or empty")
         return True
     
-    def run(self) -> None:
+    def run(self, input_dir=None, labels_dir=None, output_dir=None) -> None:
         """Run stage 2 few-shot inference pipeline."""
         self.validate()
         self.config = self.get_stage2_inference_config()
         model_paths = self.get_model_paths()
         paths = self.get_data_paths()
+
+        src = Path(input_dir) if input_dir else paths['raw_images_dir']
+        lbls = Path(labels_dir) if labels_dir else paths['class_agnostic_results_dir']
+        dst = Path(output_dir) if output_dir else paths['few_shot_results_dir']
 
         # Initialize FewShotClassPredictor
         self.model_path = model_paths['stage2_few_shot_weights_dir'] / 'best_fewshot_model.pth'
@@ -64,14 +68,14 @@ class Stage2FewShotInferencePipeline(BasePipeline):
         # Perform inference
         self.logger.info("Performing few-shot inference")
         self.few_shot_predictor.predict_class_from_prototypes(
-            img_src=paths['raw_images_dir'],
-            labels_dir=paths['class_agnostic_results_dir'],
+            img_src=src,
+            labels_dir=lbls,
             class_prototypes_dict=self.class_prototypes,
-            output_dir=paths['few_shot_results_dir'], 
+            output_dir=dst,
             distance_metric=self.config['distance_metric'],
         )
-        
+
         self.logger.info("Stage 2 few-shot inference completed successfully.")
-        self.logger.info(f"Results saved to {paths['few_shot_results_dir']}")
+        self.logger.info(f"Results saved to {dst}")
 
        

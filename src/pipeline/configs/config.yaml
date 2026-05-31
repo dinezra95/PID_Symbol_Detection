@@ -27,7 +27,7 @@ data:
 # Model paths
 models:
   root_dir: "models"
-  base_yolo_path: "base_yolo_models/yolov8n.pt"
+  base_yolo_path: "base_yolo_models/yolo11n.pt"
   stage1_class_agnostic_weights_dir: "stage1/class_agnostic"
   stage1_class_aware_weights_dir: "stage1/class_aware"
   stage2_few_shot_weights_dir: "stage2/few_shot"
@@ -52,7 +52,8 @@ symbol_detection:
 training:
   train_val_test_split: [0.7, 0.2, 0.1]
   batch_size: 4
-  epochs: 5
+  epochs: 100
+  patience: 20
   learning_rate: 0.001
   image_size: [1024, 1024]
 
@@ -83,3 +84,48 @@ stage1_inference:
 # Stage 2 Evaluation configuration
 stage2_inference:
   distance_metric: "euclidean"
+
+# Stage 3: Pipe Detection (classical CV)
+# Pipeline: text detection (MSER) → mask text+symbols → binarize → morph lines → Hough → graph
+pipe_detection:
+  preprocessing:
+    working_width: null           # null = full resolution, or set e.g. 3000 to downscale
+    binary_threshold: 200        # grayscale threshold (< this = dark feature)
+    line_kernel_length: 60       # morphological kernel for H/V line extraction (scaled for full res ~14K)
+    morph_close_iterations: 2    # close small gaps before line extraction
+    symbol_dilate_px: 12         # dilate symbol masks (scaled for full res)
+    exclude_bottom_pct: 0.08     # exclude bottom title block (fraction of height)
+    exclude_left_pct: 0.12       # exclude left legend panel (fraction of width)
+    # MSER text detection params (scaled for full resolution ~14K)
+    text_detection:
+      mser_delta: 5
+      mser_min_area: 30
+      mser_max_area: 3500
+      char_max_width: 140
+      char_max_height: 140
+      cluster_x_gap: 55
+      cluster_y_gap: 28
+      min_chars_per_group: 2
+      text_dilate_px: 12
+
+  # Line detection params (scaled for full resolution ~14K)
+  line_detection:
+    hough_threshold: 80
+    hough_min_line_length: 60
+    hough_max_line_gap: 40
+    angle_tolerance: 8
+    merge_angle_thresh: 5
+    merge_dist_thresh: 20
+    merge_gap_thresh: 60
+    bridge_max_gap: 100
+    min_segment_length: 30
+
+  graph:
+    junction_snap_dist: 40
+    min_pipe_length: 30
+
+  ocr:
+    ocr_backend: "pytesseract"
+    ocr_config: "--oem 3 --psm 6"
+    max_label_distance: 350
+    pipe_label_pattern: '(?:Ø|O|D)?[\s]*[\d/\."]+[\s]*(?:mm|in|"|'')?[\s]*[A-Za-z_]*'

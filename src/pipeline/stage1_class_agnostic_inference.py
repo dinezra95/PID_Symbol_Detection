@@ -29,20 +29,23 @@ class Stage1InferencePipeline(BasePipeline):
         if not paths['raw_images_dir'].exists():
             raise FileNotFoundError("Raw image directory not found")
         
-    def run(self) -> None:
+    def run(self, input_dir=None, output_dir=None, model_path=None) -> None:
         """Run stage 1 evaluation pipeline."""
 
         self.validate()
         self.config = self.get_stage1_inference_config()
 
+        src = Path(input_dir) if input_dir else self.get_data_paths()['raw_images_dir']
+        dst = Path(output_dir) if output_dir else self.get_data_paths()['class_agnostic_results_dir']
+
         # Initialize YOLOPredictor
-        self.model_path = get_files(self.get_model_paths()['stage1_class_agnostic_weights_dir'], [".pt"])[0]
+        self.model_path = Path(model_path) if model_path else get_files(self.get_model_paths()['stage1_class_agnostic_weights_dir'], [".pt"])[0]
         self.logger.info(f"Loading YOLO model from {self.model_path}")
         self.yolo_predictor = YOLOPredictor(self.model_path)
 
         # Perform inference
         self.yolo_predictor.perform_sliced_inference(
-            src=self.get_data_paths()['raw_images_dir'],
+            src=src,
             conf=self.config['conf'],
             slice_height=self.config['slice_height'],
             slice_width=self.config['slice_width'],
@@ -50,9 +53,9 @@ class Stage1InferencePipeline(BasePipeline):
             save_conf=self.config['save_conf'],
             overlap_height_ratio=self.config['overlap_height_ratio'],
             overlap_width_ratio=self.config['overlap_width_ratio'],
-            output_dir=self.get_data_paths()['class_agnostic_results_dir']
+            output_dir=dst
         )
-        self.logger.info("Stage 1 inference completed successfully.")
+        self.logger.info(f"Stage 1 inference completed. Results saved to {dst}")
        
         
     

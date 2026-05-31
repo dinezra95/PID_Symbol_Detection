@@ -8,6 +8,7 @@ from pipeline.stage1_class_agnostic_train import Stage1ClassAgnosticPipeline
 from pipeline.stage2_few_shot_train import Stage2FewShotPipeline
 from pipeline.stage1_class_agnostic_inference import Stage1InferencePipeline
 from pipeline.stage2_few_shot_inference import Stage2FewShotInferencePipeline
+from pipeline.stage3_pipe_detection import Stage3PipeDetectionPipeline
 from pipeline.evaluation import EvaluationPipeline
 
 def parse_args():
@@ -39,9 +40,30 @@ def parse_args():
     
     # stage 1 inference command
     stage1_inference_parser = subparsers.add_parser("stage1_inference", help="Run stage 1 inference")
+    stage1_inference_parser.add_argument("--input", type=str, default=None,
+                              help="Input directory with images (overrides config)")
+    stage1_inference_parser.add_argument("--output", type=str, default=None,
+                              help="Output directory for results (overrides config)")
+    stage1_inference_parser.add_argument("--model", type=str, default=None,
+                              help="Path to model weights (overrides config)")
 
     # stage 2 inference command
     stage2_inference_parser = subparsers.add_parser("stage2_inference", help="Run stage 2 inference")
+    stage2_inference_parser.add_argument("--input", type=str, default=None,
+                              help="Input directory with images (overrides config)")
+    stage2_inference_parser.add_argument("--labels", type=str, default=None,
+                              help="Stage 1 labels directory (overrides config)")
+    stage2_inference_parser.add_argument("--output", type=str, default=None,
+                              help="Output directory for results (overrides config)")
+
+    # Stage 3 pipe detection command
+    stage3_parser = subparsers.add_parser("stage3_pipes", help="Run stage 3 pipe detection")
+    stage3_parser.add_argument("--input", type=str, default=None,
+                              help="Input directory with P&ID images")
+    stage3_parser.add_argument("--labels", type=str, default=None,
+                              help="Directory with stage1 YOLO label .txt files")
+    stage3_parser.add_argument("--output", type=str, default=None,
+                              help="Output directory for pipe detection results")
 
     # Evaluation command
     evaluation_parser = subparsers.add_parser("evaluation", help="Run evaluation")
@@ -81,12 +103,16 @@ def main():
 
     elif args.command == "stage1_inference":
         pipeline = Stage1InferencePipeline(config_path=args.config)
-        pipeline.run()
+        pipeline.run(input_dir=args.input, output_dir=args.output, model_path=args.model)
 
     elif args.command == "stage2_inference":
         pipeline = Stage2FewShotInferencePipeline(config_path=args.config)
-        pipeline.run()
+        pipeline.run(input_dir=args.input, labels_dir=args.labels, output_dir=args.output)
         
+    elif args.command == "stage3_pipes":
+        pipeline = Stage3PipeDetectionPipeline(config_path=args.config)
+        pipeline.run(input_dir=args.input, labels_dir=args.labels, output_dir=args.output)
+
     elif args.command == "evaluation":
         # Assuming the EvaluationPipeline is implemented in a similar way to the others
         pipeline = EvaluationPipeline(config_path=args.config)
