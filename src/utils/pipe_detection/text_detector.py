@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from typing import List, Tuple, Dict, Optional
+from scipy.spatial import cKDTree
 import logging
 
 logger = logging.getLogger(__name__)
@@ -113,62 +114,53 @@ class TextDetector:
     ) -> List[Tuple[int, int, int, int]]:
         """Cluster nearby character bboxes into text line bounding boxes.
 
-        Uses a simple greedy approach: sort by y then x, merge characters
-        that are close in both x and y into groups.
+        Uses union-find over a KDTree neighbor query — O(n log n) instead of O(n²).
         """
         if not char_bboxes:
             return []
 
-        # Sort by y-center, then x-center
-        chars = sorted(char_bboxes, key=lambda b: ((b[1] + b[3]) / 2, (b[0] + b[2]) / 2))
+        n = len(char_bboxes)
+        centers = np.array([((b[0] + b[2]) / 2, (b[1] + b[3]) / 2) for b in char_bboxes])
 
-        groups: List[List[Tuple[int, int, int, int]]] = []
-        used = [False] * len(chars)
+        # Union-find
+        parent = list(range(n))
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+        def union(a, b):
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[ra] = rb
 
-        for i, box in enumerate(chars):
-            if used[i]:
+        search_radius = max(self.cluster_x_gap, self.cluster_y_gap) * 1.5
+        tree = cKDTree(centers)
+        pairs = tree.query_pairs(r=search_radius)
+
+        for i, j in pairs:
+            cx_i, cy_i = centers[i]
+            cx_j, cy_j = centers[j]
+            if abs(cy_i - cy_j) > self.cluster_y_gap:
                 continue
-            group = [box]
-            used[i] = True
-            cy_i = (box[1] + box[3]) / 2
+            x_gap = max(char_bboxes[j][0] - char_bboxes[i][2],
+                        char_bboxes[i][0] - char_bboxes[j][2])
+            if x_gap <= self.cluster_x_gap:
+                union(i, j)
 
-            for j in range(i + 1, len(chars)):
-                if used[j]:
-                    continue
-                other = chars[j]
-                cy_j = (other[1] + other[3]) / 2
+        groups: Dict[int, List[int]] = {}
+        for i in range(n):
+            root = find(i)
+            groups.setdefault(root, []).append(i)
 
-                # Stop scanning if too far below (sorted by y)
-                if cy_j - cy_i > self.cluster_y_gap * 3:
-                    break
-
-                # Check if close enough in y
-                if abs(cy_j - cy_i) > self.cluster_y_gap:
-                    continue
-
-                # Check if close enough in x to any member of the group
-                for member in group:
-                    mx2 = member[2]
-                    mx1 = member[0]
-                    ox1 = other[0]
-                    ox2 = other[2]
-                    x_gap = max(ox1 - mx2, mx1 - ox2)
-                    if x_gap <= self.cluster_x_gap:
-                        group.append(other)
-                        used[j] = True
-                        break
-
-            groups.append(group)
-
-        # Convert groups to bounding boxes
         text_bboxes = []
-        for group in groups:
-            if len(group) < self.min_chars_per_group:
+        for members in groups.values():
+            if len(members) < self.min_chars_per_group:
                 continue
-            x1 = min(b[0] for b in group)
-            y1 = min(b[1] for b in group)
-            x2 = max(b[2] for b in group)
-            y2 = max(b[3] for b in group)
+            x1 = min(char_bboxes[i][0] for i in members)
+            y1 = min(char_bboxes[i][1] for i in members)
+            x2 = max(char_bboxes[i][2] for i in members)
+            y2 = max(char_bboxes[i][3] for i in members)
             text_bboxes.append((x1, y1, x2, y2))
 
         return text_bboxes

@@ -20,6 +20,14 @@ __pycache__/
 
 # Temp scripts
 src/check_ocr*.py
+src/text_density.py
+src/baseline_vis.py
+src/test_florence2.py
+src/visualize_graph.py
+
+# Experiment results
+results/florence2_test/
+results/stage_3/baseline_lsd/*/*.png
 
 # Playground / notebooks
 playground/

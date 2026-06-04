@@ -18,6 +18,7 @@ from pipeline.base import BasePipeline
 from typing import Dict, Optional
 from pathlib import Path
 import cv2
+import time
 import logging
 
 from utils.pipe_detection.data_structures import Point, LineSegment
@@ -100,6 +101,9 @@ class Stage3PipeDetectionPipeline(BasePipeline):
             scale = working_width / orig_w
         inv_scale = 1.0 / scale
 
+        t0 = time.time()
+        timings = {}
+
         # --- Step 1: Load symbol bboxes ---
         bboxes_orig = []
         if label_path:
@@ -108,21 +112,23 @@ class Stage3PipeDetectionPipeline(BasePipeline):
             logger.warning(f"No label file for {img_name} — running without symbol masking")
 
         # --- Step 2-4: Preprocess (text detect + mask + binarize + morph) ---
+        t = time.time()
         pipe_mask, symbol_mask, text_mask, working_img, text_bboxes = \
             preprocessor.preprocess(image, bboxes_orig)
+        timings["preprocess (MSER + mask + morph)"] = time.time() - t
 
         visualizer.save_mask(pipe_mask, "01_pipe_mask")
         visualizer.save_mask(text_mask, "02_text_mask")
 
-        # Draw text detection overlay
         text_vis = working_img.copy()
         for x1, y1, x2, y2 in text_bboxes:
             cv2.rectangle(text_vis, (x1, y1), (x2, y2), (0, 0, 255), 1)
         cv2.imwrite(str(img_output / "03_text_detection.png"), text_vis)
 
         # --- Step 5: Line detection (at working resolution) ---
-        bboxes_small = preprocessor._scale_bboxes(bboxes_orig, scale)
-        segments_small = line_detector.detect_and_refine(pipe_mask, bboxes_small)
+        t = time.time()
+        segments_small = line_detector.detect_and_refine(pipe_mask)
+        timings["line detection (Hough + merge)"] = time.time() - t
 
         if not segments_small:
             logger.warning(f"No pipe segments detected in {img_name}")
@@ -139,29 +145,39 @@ class Stage3PipeDetectionPipeline(BasePipeline):
         visualizer.draw_lines_on_image(image, segments_orig, "04_detected_lines", thickness=3)
 
         # --- Step 6: Build graph (at working resolution) ---
+        t = time.time()
         graph = graph_builder.build_graph(segments_small)
         graph = graph_builder.simplify_graph(graph)
-
-        # Scale graph to original resolution
         self._scale_graph(graph, inv_scale)
+        timings["graph construction"] = time.time() - t
+
+        # --- Step 6b: Connect pipe segments through symbols ---
+        t = time.time()
+        graph = graph_builder.connect_through_symbols(graph, bboxes_orig)
+        timings["symbol connections"] = time.time() - t
 
         # --- Step 7: OCR label matching ---
+        t = time.time()
         text_regions = label_matcher.extract_text_regions(image)
         if text_regions:
             pipe_labels = label_matcher.filter_pipe_labels(text_regions)
             label_matcher.match_labels_to_pipes(pipe_labels, graph)
-
-        # --- Step 7b: Filter — keep only components with diameter labels ---
-        visualizer.draw_pipe_graph(image, graph, "05_pipe_graph_unfiltered")
-        graph = graph_builder.filter_to_labeled_components(graph)
+        timings["OCR (pytesseract)"] = time.time() - t
 
         # --- Step 8: Output ---
-        visualizer.draw_pipe_graph(image, graph, "06_pipe_graph_filtered")
-
+        t = time.time()
+        visualizer.draw_pipe_graph(image, graph, "05_pipe_graph")
         json_path = str(img_output / "pipe_graph.json")
         graph.save_json(json_path)
+        timings["output (viz + JSON)"] = time.time() - t
+
+        total = time.time() - t0
         logger.info(f"Saved: {json_path}")
         logger.info(graph.summary())
+        logger.info(f"--- Timing for {img_name} (total {total:.1f}s) ---")
+        for step, dt in timings.items():
+            pct = dt / total * 100
+            logger.info(f"  {step}: {dt:.1f}s ({pct:.0f}%)")
 
     @staticmethod
     def _scale_graph(graph, factor: float):

@@ -94,8 +94,8 @@ pipe_detection:
     line_kernel_length: 60       # morphological kernel for H/V line extraction (scaled for full res ~14K)
     morph_close_iterations: 2    # close small gaps before line extraction
     symbol_dilate_px: 12         # dilate symbol masks (scaled for full res)
-    exclude_bottom_pct: 0.08     # exclude bottom title block (fraction of height)
-    exclude_left_pct: 0.12       # exclude left legend panel (fraction of width)
+    exclude_bottom_pct: 0.0      # disabled — label filter handles noise removal
+    exclude_left_pct: 0.0        # disabled — label filter handles noise removal
     # MSER text detection params (scaled for full resolution ~14K)
     text_detection:
       mser_delta: 5
@@ -123,6 +123,8 @@ pipe_detection:
   graph:
     junction_snap_dist: 40
     min_pipe_length: 30
+    symbol_padding: 40            # search radius around symbol bbox for pipe endpoints
+    symbol_coord_tolerance: 25    # max y-diff (H) or x-diff (V) for through-symbol connection
 
   ocr:
     ocr_backend: "pytesseract"

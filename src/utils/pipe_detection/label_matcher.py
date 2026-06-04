@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
+import os
 import re
+import tempfile
 from typing import List, Dict, Tuple, Optional
 from .data_structures import Point, LineSegment, PipeSegment, TextRegion, PipeGraph
 import logging
@@ -63,7 +65,20 @@ class LabelMatcher:
 
     def _extract_pytesseract(self, image: np.ndarray, pytesseract) -> List[TextRegion]:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image
-        data = pytesseract.image_to_data(gray, config=self.ocr_config, output_type=pytesseract.Output.DICT)
+        old_tmpdir = os.environ.get("TMPDIR")
+        try:
+            fallback_tmp = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".tmp")
+            os.makedirs(fallback_tmp, exist_ok=True)
+            os.environ["TMPDIR"] = fallback_tmp
+            data = pytesseract.image_to_data(gray, config=self.ocr_config, output_type=pytesseract.Output.DICT)
+        except Exception as e:
+            logger.warning(f"pytesseract failed: {e}")
+            return []
+        finally:
+            if old_tmpdir is not None:
+                os.environ["TMPDIR"] = old_tmpdir
+            elif "TMPDIR" in os.environ:
+                del os.environ["TMPDIR"]
 
         regions = []
         n = len(data["text"])

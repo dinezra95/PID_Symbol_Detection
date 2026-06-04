@@ -291,9 +291,8 @@ class LineDetector:
     def detect_and_refine(
         self,
         pipe_mask: np.ndarray,
-        symbol_bboxes: List[Tuple[int, int, int, int]],
     ) -> List[LineSegment]:
-        """Full line detection pipeline: detect → filter → snap → merge → bridge."""
+        """Full line detection pipeline: detect → filter → snap → merge."""
         raw_lines = self.detect_lines(pipe_mask)
         if not raw_lines:
             return []
@@ -301,8 +300,6 @@ class LineDetector:
         orthogonal = self.filter_near_orthogonal(raw_lines)
         snapped = self.snap_to_orthogonal(orthogonal)
         merged = self.merge_collinear_segments(snapped)
-        bridged = self.bridge_symbol_gaps(merged, symbol_bboxes)
-        final = self.merge_collinear_segments(bridged)
 
-        logger.info(f"Final line count after all refinement: {len(final)}")
-        return final
+        logger.info(f"Final line count after all refinement: {len(merged)}")
+        return merged

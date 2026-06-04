@@ -112,6 +112,18 @@ class Junction:
 
 
 @dataclass
+class SymbolNode:
+    id: str
+    bbox: Tuple[int, int, int, int]  # x1, y1, x2, y2
+    symbol_class: str = "symbol"
+
+    @property
+    def center(self) -> Point:
+        x1, y1, x2, y2 = self.bbox
+        return Point((x1 + x2) / 2, (y1 + y2) / 2)
+
+
+@dataclass
 class TextRegion:
     bbox: Tuple[int, int, int, int]  # x, y, w, h
     text: str
@@ -128,6 +140,7 @@ class PipeGraph:
         self.graph = nx.Graph()
         self.junctions: Dict[int, Junction] = {}
         self.pipe_segments: Dict[int, PipeSegment] = {}
+        self.symbol_nodes: Dict[str, SymbolNode] = {}
         self.text_regions: List[TextRegion] = []
 
     def add_junction(self, junction: Junction):
@@ -136,6 +149,16 @@ class PipeGraph:
             junction.id,
             pos=junction.position.as_tuple(),
             type=junction.junction_type,
+        )
+
+    def add_symbol_node(self, symbol: SymbolNode):
+        self.symbol_nodes[symbol.id] = symbol
+        self.graph.add_node(
+            symbol.id,
+            pos=symbol.center.as_tuple(),
+            type="symbol",
+            symbol_class=symbol.symbol_class,
+            bbox=symbol.bbox,
         )
 
     def add_pipe(self, pipe: PipeSegment, from_junction_id: int, to_junction_id: int):
@@ -167,22 +190,41 @@ class PipeGraph:
                 "degree": j.degree,
                 "connected_pipes": j.connected_pipe_ids,
             })
+        for sid, s in self.symbol_nodes.items():
+            nodes.append({
+                "id": sid,
+                "x": s.center.x,
+                "y": s.center.y,
+                "type": "symbol",
+                "symbol_class": s.symbol_class,
+                "bbox": list(s.bbox),
+            })
         edges = []
         for u, v, data in self.graph.edges(data=True):
-            edges.append({
-                "from": u,
-                "to": v,
-                "pipe_id": data.get("pipe_id"),
-                "length": data.get("length"),
-                "label": data.get("label"),
-                "diameter": data.get("diameter"),
-                "pipe_type": data.get("pipe_type"),
-            })
+            if data.get("type") == "symbol_connection":
+                edges.append({
+                    "from": u,
+                    "to": v,
+                    "type": "connected_through_symbol",
+                    "confidence": data.get("confidence", 0.0),
+                })
+            else:
+                edges.append({
+                    "from": u,
+                    "to": v,
+                    "type": "pipe",
+                    "pipe_id": data.get("pipe_id"),
+                    "length": data.get("length"),
+                    "label": data.get("label"),
+                    "diameter": data.get("diameter"),
+                    "pipe_type": data.get("pipe_type"),
+                })
         return {
             "nodes": nodes,
             "edges": edges,
-            "num_junctions": len(nodes),
-            "num_pipes": len(edges),
+            "num_junctions": len(self.junctions),
+            "num_symbols": len(self.symbol_nodes),
+            "num_pipes": len(self.pipe_segments),
             "text_regions": [
                 {"bbox": t.bbox, "text": t.text, "confidence": t.confidence}
                 for t in self.text_regions
@@ -196,6 +238,7 @@ class PipeGraph:
     def summary(self) -> str:
         return (
             f"PipeGraph: {len(self.junctions)} junctions, "
+            f"{len(self.symbol_nodes)} symbol nodes, "
             f"{len(self.pipe_segments)} pipe segments, "
             f"{nx.number_connected_components(self.graph)} connected components, "
             f"{len(self.text_regions)} text labels"

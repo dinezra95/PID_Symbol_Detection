@@ -1,4 +1,4 @@
-from .data_structures import Point, LineSegment, PipeSegment, Junction, TextRegion, PipeGraph
+from .data_structures import Point, LineSegment, PipeSegment, Junction, SymbolNode, TextRegion, PipeGraph
 from .text_detector import TextDetector
 from .preprocessor import PipePreprocessor
 from .line_detector import LineDetector

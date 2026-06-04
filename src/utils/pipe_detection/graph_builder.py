@@ -2,7 +2,7 @@ import numpy as np
 import networkx as nx
 from typing import List, Dict, Tuple, Optional
 from scipy.spatial import KDTree
-from .data_structures import Point, LineSegment, PipeSegment, Junction, PipeGraph
+from .data_structures import Point, LineSegment, PipeSegment, Junction, SymbolNode, PipeGraph
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,6 +15,8 @@ class GraphBuilder:
         self.config = config
         self.junction_snap_dist = config.get("junction_snap_dist", 15)
         self.min_pipe_length = config.get("min_pipe_length", 15)
+        self.symbol_padding = config.get("symbol_padding", 40)
+        self.symbol_coord_tolerance = config.get("symbol_coord_tolerance", 25)
 
     def build_graph(self, segments: List[LineSegment]) -> PipeGraph:
         """Convert line segments into a PipeGraph with junctions and pipes."""
@@ -219,6 +221,79 @@ class GraphBuilder:
 
         return graph
 
+    def connect_through_symbols(
+        self,
+        graph: PipeGraph,
+        symbol_bboxes: List[Tuple[int, int, int, int]],
+    ) -> PipeGraph:
+        """Connect pipe segments through symbols by creating symbol nodes.
+
+        For each symbol bbox, finds junctions near opposite edges and
+        connects them through a symbol node in the graph.
+        """
+        padding = self.symbol_padding
+        tol = self.symbol_coord_tolerance
+        connections = 0
+
+        for i, (sx1, sy1, sx2, sy2) in enumerate(symbol_bboxes):
+            left, right, top, bottom = [], [], [], []
+
+            for jid, junction in graph.junctions.items():
+                jx, jy = junction.position.x, junction.position.y
+
+                in_y_band = (sy1 - padding) <= jy <= (sy2 + padding)
+                in_x_band = (sx1 - padding) <= jx <= (sx2 + padding)
+
+                if jx < sx1 and (sx1 - jx) <= padding and in_y_band:
+                    left.append(jid)
+                elif jx > sx2 and (jx - sx2) <= padding and in_y_band:
+                    right.append(jid)
+
+                if jy < sy1 and (sy1 - jy) <= padding and in_x_band:
+                    top.append(jid)
+                elif jy > sy2 and (jy - sy2) <= padding and in_x_band:
+                    bottom.append(jid)
+
+            sym_id = f"sym_{i}"
+
+            for lid in left:
+                for rid in right:
+                    ly = graph.junctions[lid].position.y
+                    ry = graph.junctions[rid].position.y
+                    if abs(ly - ry) <= tol:
+                        if sym_id not in graph.symbol_nodes:
+                            graph.add_symbol_node(SymbolNode(
+                                id=sym_id, bbox=(sx1, sy1, sx2, sy2),
+                            ))
+                        conf = round(1.0 - abs(ly - ry) / max(tol, 1), 2)
+                        if not graph.graph.has_edge(lid, sym_id):
+                            graph.graph.add_edge(lid, sym_id, type="symbol_connection", confidence=conf)
+                        if not graph.graph.has_edge(sym_id, rid):
+                            graph.graph.add_edge(sym_id, rid, type="symbol_connection", confidence=conf)
+                        connections += 1
+
+            for tid in top:
+                for bid in bottom:
+                    tx = graph.junctions[tid].position.x
+                    bx = graph.junctions[bid].position.x
+                    if abs(tx - bx) <= tol:
+                        if sym_id not in graph.symbol_nodes:
+                            graph.add_symbol_node(SymbolNode(
+                                id=sym_id, bbox=(sx1, sy1, sx2, sy2),
+                            ))
+                        conf = round(1.0 - abs(tx - bx) / max(tol, 1), 2)
+                        if not graph.graph.has_edge(tid, sym_id):
+                            graph.graph.add_edge(tid, sym_id, type="symbol_connection", confidence=conf)
+                        if not graph.graph.has_edge(sym_id, bid):
+                            graph.graph.add_edge(sym_id, bid, type="symbol_connection", confidence=conf)
+                        connections += 1
+
+        logger.info(
+            f"Symbol connections: {connections} pipe pairs through "
+            f"{len(graph.symbol_nodes)} symbol nodes"
+        )
+        return graph
+
     def filter_to_labeled_components(self, graph: PipeGraph) -> PipeGraph:
         """Keep only connected components that contain at least one labeled pipe."""
         labeled_nodes = set()
@@ -245,9 +320,15 @@ class GraphBuilder:
         for jid in keep_nodes:
             if jid in graph.junctions:
                 filtered.add_junction(graph.junctions[jid])
+            elif jid in graph.symbol_nodes:
+                filtered.add_symbol_node(graph.symbol_nodes[jid])
 
         for u, v, data in graph.graph.edges(data=True):
-            if u in keep_nodes and v in keep_nodes:
+            if u not in keep_nodes or v not in keep_nodes:
+                continue
+            if data.get("type") == "symbol_connection":
+                filtered.graph.add_edge(u, v, **data)
+            else:
                 pid = data.get("pipe_id")
                 if pid is not None and pid in graph.pipe_segments:
                     filtered.add_pipe(graph.pipe_segments[pid], u, v)

@@ -60,6 +60,25 @@ class PipeVisualizer:
             for seg in pipe.segments:
                 cv2.line(vis, seg.start.as_tuple(), seg.end.as_tuple(), COLORS["pipe"], 2)
 
+        # Draw symbol-connection edges as dashed-style lines
+        for u, v, data in graph.graph.edges(data=True):
+            if data.get("type") == "symbol_connection":
+                pos_u = graph.graph.nodes[u].get("pos")
+                pos_v = graph.graph.nodes[v].get("pos")
+                if pos_u and pos_v:
+                    cv2.line(vis, pos_u, pos_v, COLORS["bridge"], 2)
+
+        # Draw symbol nodes
+        for sid, sym in graph.symbol_nodes.items():
+            x1, y1, x2, y2 = sym.bbox
+            cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 220, 0), 2)
+            cx, cy = sym.center.as_tuple()
+            cv2.putText(
+                vis, sid,
+                (x1, y1 - 5),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 220, 0), 1,
+            )
+
         for jid, junction in graph.junctions.items():
             color_key = f"junction_{junction.junction_type}"
             color = COLORS.get(color_key, (128, 128, 128))
